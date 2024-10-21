@@ -11,9 +11,9 @@ class Navbar extends Component
     public array $profileMenu;
     public string $currentNav;
 
-    public function __construct()
+    public function mount($nav)
     {
-        $this->currentNav = 'Users';
+        $this->currentNav = $nav;
 
         $this->navMenu = [
             [

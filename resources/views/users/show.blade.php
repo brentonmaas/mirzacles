@@ -1,3 +1,3 @@
 <x-app-layout :nav="$nav">
-    <livewire:userTable />
+    <livewire:userProfile :id="$id" />
 </x-app-layout>

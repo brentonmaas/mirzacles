@@ -19,5 +19,11 @@ export default {
         },
     },
 
+    variants: {
+        extend: {
+            scrollbar: ['rounded'],
+        },
+    },
+
     plugins: [forms, typography],
 };
