@@ -66,8 +66,8 @@
                         <button @click="open = !open" type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                             <span class="absolute -inset-1.5"></span>
                             <span class="sr-only">Open user menu</span>
-                            <div class="flex h-10 w-10 rounded-full text-white bg-gray-900" style="font-size:18px;align-items:center;justify-content:center;">
-                                <i class="fa-solid fa-user"></i>
+                            <div class="flex h-12 w-12 rounded-full text-white" style="font-size:18px;align-items:center;justify-content:center;">
+                                <img src="{{ $profileImage }}" alt="Profile Image" class="h-12 w-12 rounded-full" />
                             </div>
                         </button>
                     </div>

@@ -8,12 +8,7 @@
                 </div>
                 <div class="mt-6 flex">
                     <div class="mr-10 py-4">
-                        @if($imageIsUrl)
-                            <img class="max-h-80 rounded-md" src="{{ $user->profile_photo_path }}" alt="{{ $fullname }}">
-                        @else
-                            <img class="max-h-80 rounded-md" src="{{ asset($user->profile_photo_path) }}" alt="{{ $fullname }}">
-                        @endif
-
+                        <img class="max-h-80 rounded-md" src="{{ $user->avatar }}" alt="{{ $fullname }}">
                     </div>
                     <div class="border-t border-white/10 grow">
                         <dl class="divide-y divide-white/10">

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -9,11 +10,17 @@ class Navbar extends Component
 {
     public array $navMenu;
     public array $profileMenu;
+    public string $profileImage;
     public string $currentNav;
+    protected $userService;
 
-    public function mount($nav)
+    public function mount($nav, UserService $userService)
     {
         $this->currentNav = $nav;
+        $this->userService = $userService;
+
+        $user = $this->userService->find(Auth::id());
+        $this->profileImage = $user->avatar;
 
         $this->navMenu = [
             [
@@ -45,7 +52,7 @@ class Navbar extends Component
 
     public function editProfile()
     {
-        return redirect()->route('users.edit',['userId'=> Auth::id()]);
+        return redirect()->route('users.edit',['id'=> Auth::id()]);
     }
 
     public function viewTrashed()

@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserServiceInterface;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserServiceInterface $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function index()
     {
         $nav = 'Users';
@@ -23,7 +31,7 @@ class UserController extends Controller
     public function create()
     {
         $nav = 'Create';
-        return view('users.edit', compact('nav'));
+        return view('users.create', compact('nav'));
     }
 
     public function edit($id)
@@ -34,7 +42,6 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $nav = 'Users';
         $user = User::find($id);
 
         if ($user) {
@@ -70,50 +77,27 @@ class UserController extends Controller
         return redirect()->route('users.trashed')->with('success', 'User deleted permanently.');
     }
 
-    public function update(Request $request, $id)
+    public function store(UserRequest $request)
     {
-        $validatedData = $request->validate([
-            'username' => 'required|string|max:255',
-            'password' => 'required|string|min:8',  // Password validation
-            'confirm_password' => 'required_with:password|string|min:8', // Confirm Password validation
-            'email' => 'required|email|max:255',
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'middlename' => 'nullable|string|max:255',
-            'prefixname' => 'required|string|max:3',
-            'suffixname' => 'nullable|string|max:255',
-            'type' => 'required|string|max:255',
-            'photo' => 'nullable|file|max:2048',
-        ]);
+        // Extract validated attributes from the request
+        $attributes = $request->validated();
 
-        // Retrieve the user record
-        $user = User::findOrFail($id);
+        // Call the user service's store method with the validated attributes
+        $this->userService->store($attributes);
 
-        // Update the user fields
-        $user->name = $validatedData['username'];
-        $user->email = $validatedData['email'];
-        $user->firstname = $validatedData['firstname'];
-        $user->lastname = $validatedData['lastname'];
-        $user->middlename = $validatedData['middlename'];
-        $user->prefixname = $validatedData['prefixname'];
-        $user->suffixname = $validatedData['suffixname'];
-        $user->type = $validatedData['type'];
-
-        // If a new password is provided
-        if ($request->filled('password') && $validatedData['password'] != 'password') {
-            $user->password = Hash::make($validatedData['password']);
-        }
-
-        // If a photo is uploaded
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('photos', 'public');
-            $user->profile_photo_path = $photoPath;
-        }
-
-        $user->save();
-
-        // Redirect or return a response
-        return redirect()->route('users.index')->with('success', 'User added/updated successfully!');
+        // Redirect to the users index route with a success message
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
+    public function update(UserRequest $request, $id)
+    {
+        // Extract validated attributes from the request
+        $attributes = $request->validated();
+
+        // Call the user service's update method with the user ID and validated attributes
+        $this->userService->update($id, $attributes);
+
+        // Redirect to the users index route with a success message
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+    }
 }

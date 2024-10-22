@@ -30,9 +30,11 @@ Route::middleware([
         ->name('users.edit');
     Route::get('/users/destroy/{id}', [UserController::class, 'destroy'])
         ->name('users.destroy');
-    Route::post('/users/update/{id}', [UserController::class, 'update'])
+    Route::get('/users/store/{id}', [UserController::class, 'store'])
+        ->name('users.store');
+    Route::get('/users/update/{id}', [UserController::class, 'update'])
         ->name('users.update');
-    Route::softDeletes('users', 'UserController');
+    Route::softDeletes('users', UserController::class);
     Route::get('/logout', function () {
         return view('auth/login');
     });

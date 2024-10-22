@@ -9,7 +9,7 @@
             </div>
             <div wire:click="clearErrors" class="flex text-base text-white hover:text-gray-200 font-semibold justify-right text-right items-center cursor-pointer">
                 <div class="inline-block align-middle">Close</div>
-                <div class="inline-block align-middle ml-2" style="font-size:20px">
+                <div class="inline-block align-middle ml-2" style="font-size:24px">
                     <i class="fa-solid fa-xmark"></i>
                 </div>
             </div>

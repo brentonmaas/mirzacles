@@ -3,104 +3,119 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use App\Services\UserServiceInterface;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class UserTable extends Component
 {
-    public array $table;
-    public array $pagination;
+    use WithPagination;
     public int $perPage = 20;
     public int $pageDelta = 2;
-    public int $total;
-    public int $totalPages;
     public int $currentPage = 1;
-    public int $offset;
-    public int $lastPage;
-    public int $from;
-    public int $to;
-    public string $search = '';
-    public string $sortField = 'id';
-    public string $sortDirection = 'asc';
-    public string $type = '';
 
-    public function __construct()
+    public array $columns;
+    public array $actions;
+
+    protected $userService;
+
+    public function mount(UserServiceInterface $userService)
     {
+        $this->userService = $userService;
+
         // create table array
-        $this->table = [
-            'columns' => [
-                'name' => 'Name',
-                'username' => 'Username',
-                'prefixname' => 'Prefix Name',
-                'suffixname' => 'Suffix Name',
-                'type' => 'Type',
-                'actions' => 'Actions',
-            ],
-            'rows' => [],
+        $this->columns = [
+            'name' => 'Name',
+            'username' => 'Username',
+            'prefixname' => 'Prefix Name',
+            'suffixname' => 'Suffix Name',
+            'type' => 'Type',
+            'actions' => 'Actions',
         ];
 
-        $this->setData();
-        $this->setPagination();
+        $this->actions = [
+            [
+                'route' => 'users.show',
+                'hoverColor' => 'indigo-300',
+                'icon' => 'fa-solid fa-eye',
+                'method' => 'GET',
+            ],
+            [
+                'route' => 'users.edit',
+                'hoverColor' => 'indigo-300',
+                'icon' => 'fa-solid fa-pen-to-square',
+                'method' => 'GET',
+            ],
+            [
+                'route' => 'users.destroy',
+                'hoverColor' => 'red-500',
+                'icon' => 'fa-solid fa-trash-can',
+                'method' => 'GET',
+            ]
+        ];
     }
 
     public function nextPage() {
-        $this->changePage($this->currentPage + 1);
+        $this->currentPage++;
+        $this->setPage($this->currentPage);
     }
 
     public function previousPage() {
-        $this->changePage($this->currentPage - 1);
+        $this->currentPage--;
+        $this->setPage($this->currentPage);
     }
 
     public function changePage($page) {
         $this->currentPage = $page;
-        $this->setData();
-        $this->setPagination();
+        $this->setPage($page);
     }
 
-    public function setData()
+    protected function formatData($users)
     {
-        // get all the users except current logged-in user
-        $users = User::where('deleted_at', null)
-                    ->where('id', '!=', Auth::id())
-                    ->get();
+        $rows = array();
 
-        // format the user collection data into a row array
-        $rows = $this->formatData($users);
+        // Loop through users and format row values to suit
+        foreach ($users as $user) {
+            $rows[] = [
+                'id' => $user->id,
+                'fullname' => $user->fullname,
+                'prefixname' => $user->prefixname,
+                'suffixname' => $user->suffixname,
+                'username' => $user->name,
+                'email' => $user->email,
+                'photo' => $user->avatar,
+                'type' => $user->type,
+            ];
+        }
 
-        // Calculate total number of rows
-        $this->total = count($rows);
+        return $rows;
+    }
+
+    protected function getPagination($rows, $total) {
+        $pages = [];
 
         // Calculate total number of pages
-        $this->totalPages = ceil($this->total / $this->perPage);
+        $totalPages = ceil($total / $this->perPage);
 
         // Calculate the offset (index) to start slicing the array
         $offset = ($this->currentPage - 1) * $this->perPage;
 
         // Calculate the range of results
-        $this->from = $offset + 1;
-        $this->to = min($offset + $this->perPage, $this->total);
+        $from = $offset + 1;
+        $to = min($offset + $this->perPage, $total);
 
-        // Slice the array to get items on the current page
-        $pagedData = array_slice($rows, $offset, $this->perPage);
-
-        // Set the pages data to the table
-        $this->table['rows'] = $pagedData;
-    }
-
-    private function setPagination() {
-        $pages = [];
         // Ensure current page is within total pages range
-        if ($this->currentPage < 1 || $this->currentPage > $this->totalPages) {
-            $this->from = 0;
-            $this->pagination = [];
-            return;
+        if ($this->currentPage < 1 || $this->currentPage > $totalPages) {
+            $from = 0;
         }
 
         // Generate pagination numbers with delta for range
         $rangeStart = max(1, $this->currentPage - $this->pageDelta);
-        $rangeEnd = min($this->totalPages, $this->currentPage + $this->pageDelta);
+        $rangeEnd = min($totalPages, $this->currentPage + $this->pageDelta);
 
-        //determine if first page is just before range start and add it
+        // Determine if first page is just before range start and add it
         if($rangeStart == 2) {
             $pages[] = 1;
         }
@@ -110,44 +125,43 @@ class UserTable extends Component
             $pages[] = $i;
         }
 
-        //determine if last page is just after range end and add it
-        if($rangeEnd + 1 == $this->totalPages) {
-            $pages[] = $this->totalPages;
+        // Determine if last page is just after range end and add it
+        if($rangeEnd + 1 == $totalPages) {
+            $pages[] = $totalPages;
         }
 
-        $this->pagination = [
+        return array(
+            'total' => $total,
             'pages' => $pages,
             'current_page' => $this->currentPage,
-            'total_pages' => $this->totalPages,
+            'total_pages' => $totalPages,
+            'from' => $from,
+            'to' => $to,
             'jump_first' => $this->currentPage - $this->pageDelta > 2,
-            'jump_last' => ($this->currentPage + $this->pageDelta) < ($this->totalPages - 1),
-        ];
-
-
+            'jump_last' => ($this->currentPage + $this->pageDelta) < ($totalPages - 1),
+        );
     }
 
-    private function formatData($users) {
-        $rows = array();
-
-        // Loop through users and format row values to suit
-        foreach ($users as $user) {
-            $rows[] = [
-                'id' => $user->id,
-                'fullname' => $user->firstname . ' ' . $user->middlename . ' ' . $user->lastname,
-                'prefixname' => $user->prefixname,
-                'suffixname' => $user->suffixname,
-                'username' => $user->name,
-                'email' => $user->email,
-                'photo' => $user->profile_photo_path,
-                'type' => $user->type,
-            ];
-        }
-
-        return $rows;
+    public function createUser()
+    {
+        return redirect()->route('users.create');
     }
 
     public function render()
     {
-        return view('livewire.user-table');
+        $users = $this->userService->list($this->perPage);
+        $rows = $users->items();
+        $total = $this->userService->total();
+
+        return view('livewire.user-table', [
+            'rows' => $this->formatData($rows),
+            'pagination' => $this->getPagination($rows, $total),
+        ]);
+    }
+
+    public function hydrate()
+    {
+        // Reinstantiate the user service between calls
+        $this->userService = App::make(UserServiceInterface::class);
     }
 }

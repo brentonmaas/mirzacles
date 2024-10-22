@@ -29,7 +29,7 @@ return new class extends Migration
                 'name' => $name,
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make(Str::random(10)),
-                'profile_photo_path' => $faker->imageUrl(400, 400, 'people', true, 'Faker'),
+                'profile_photo_path' => null,
                 'type' => 'user',
                 'remember_token' => null,
                 'email_verified_at' => null,
