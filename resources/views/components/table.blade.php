@@ -25,7 +25,7 @@
                     <tr>
                         @foreach($columns as $index => $column)
                             @switch($index)
-                                @case('name')
+                                @case('user')
                                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0">{{ $column }}</th>
                                     @break
                                 @case('actions')
@@ -51,14 +51,14 @@
                         <tr>
                             @foreach($columns as $index => $column)
                                 @switch($index)
-                                    @case('name')
+                                    @case('user')
                                         <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
                                             <div class="flex items-center">
                                                 <div class="h-11 w-11 flex-shrink-0">
                                                     <img class="h-11 w-11 rounded-full" src="{{ $row['photo'] }}" alt="">
                                                 </div>
                                                 <div class="ml-4">
-                                                    <div class="font-medium text-gray-300">{{ $row['fullname'] }}</div>
+                                                    <div class="font-medium text-gray-300">{{ $row['user'] }}</div>
                                                     <div class="mt-1 text-gray-500">{{ $row['email'] }}</div>
                                                 </div>
                                             </div>

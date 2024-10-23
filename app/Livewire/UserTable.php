@@ -27,10 +27,10 @@ class UserTable extends Component
 
         // create table array
         $this->columns = [
-            'name' => 'Name',
-            'username' => 'Username',
-            'prefixname' => 'Prefix Name',
-            'suffixname' => 'Suffix Name',
+            'user' => 'User',
+            'fullname' => 'Fullname',
+            'middle' => 'Middle Initial',
+            'gender' => 'Gender',
             'type' => 'Type',
             'actions' => 'Actions',
         ];
@@ -49,10 +49,10 @@ class UserTable extends Component
                 'method' => 'GET',
             ],
             [
-                'route' => 'users.destroy',
+                'route' => 'users.delete',
                 'hoverColor' => 'red-500',
                 'icon' => 'fa-solid fa-trash-can',
-                'method' => 'GET',
+                'method' => 'DELETE',
             ]
         ];
     }
@@ -80,10 +80,10 @@ class UserTable extends Component
         foreach ($users as $user) {
             $rows[] = [
                 'id' => $user->id,
+                'user' => $user->name,
                 'fullname' => $user->fullname,
-                'prefixname' => $user->prefixname,
-                'suffixname' => $user->suffixname,
-                'username' => $user->name,
+                'middle' => $user->middleInitial,
+                'gender' => $user->gender,
                 'email' => $user->email,
                 'photo' => $user->avatar,
                 'type' => $user->type,

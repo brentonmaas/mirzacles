@@ -188,4 +188,46 @@ class UserServiceTest extends TestCase
         // Assertions
         $this->assertEquals($initialCount + 4, $totalTrashedUsers);
     }
+
+    #[Test]
+    public function it_can_update_user_details()
+    {
+        // Arrangements
+        $user = User::factory()->create([
+            'firstname' => 'John',
+            'lastname' => 'Doe',
+            'middlename' => 'Middle',
+            'prefixname' => 'Mr',
+            'suffixname' => 'Jr',
+        ]);
+
+        // Actions
+        $this->userService->updateDetails($user);
+
+        // Assertions
+        $this->assertDatabaseHas('details', [
+            'key' => 'Full name',
+            'value' => $user->getFullnameAttribute() . ' ' . $user->suffixname,
+            'type' => 'bio',
+            'user_id' => $user->id
+        ]);
+        $this->assertDatabaseHas('details', [
+            'key' => 'Middle Initial',
+            'value' => $user->getMiddleInitialAttribute(),
+            'type' => 'bio',
+            'user_id' => $user->id
+        ]);
+        $this->assertDatabaseHas('details', [
+            'key' => 'Avatar',
+            'value' => $user->getAvatarAttribute(),
+            'type' => 'bio',
+            'user_id' => $user->id
+        ]);
+        $this->assertDatabaseHas('details', [
+            'key' => 'Gender',
+            'value' => $user->getGenderAttribute(),
+            'type' => 'bio',
+            'user_id' => $user->id
+        ]);
+    }
 }

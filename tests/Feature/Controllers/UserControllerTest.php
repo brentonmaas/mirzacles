@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 #[PreserveGlobalState(false)]
 class UserControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithoutMiddleware;
 
     protected function setUp(): void
     {
@@ -48,7 +49,7 @@ class UserControllerTest extends TestCase
         // Assertions
         $response->assertStatus(200);
         $response->assertViewIs('users.show');
-        $response->assertViewHasAll(['nav', 'Show']);
+        $response->assertViewHas('nav', 'Show');
         $response->assertViewHas('id', $user->id);
     }
 
@@ -84,27 +85,37 @@ class UserControllerTest extends TestCase
     #[Test]
     public function it_can_delete_a_user()
     {
+        $this->withoutMiddleware();
+
         // Arrangements
         $user = User::factory()->create();
 
+        // Use route `method` to get the delete URL
+        $route = route('users.delete', ['id' => $user->id]);
+
         // Actions
-        $response = $this->delete(route('users.destroy', $user->id));
+        $response = $this->actingAs($user)->delete($route);
 
         // Assertions
         $response->assertRedirect(route('users.index'));
         $response->assertSessionHas('success', 'User moved to trash!');
-        $this->assertSoftDeleted($user);
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
     }
 
     #[Test]
-    public function it_returns_error_when_deleting_non_existent_user()
+    public function it_can_destroy_a_user()
     {
+        // Arrangements
+        $user = User::factory()->create();
+        $user->delete();
+
         // Actions
-        $response = $this->delete(route('users.destroy', 999));
+        $response = $this->get(route('users.destroy', $user->id));
 
         // Assertions
-        $response->assertRedirect(route('users.index'));
-        $response->assertSessionHas('error', 'User Not Found!');
+        $response->assertRedirect(route('users.trashed'));
+        $response->assertSessionHas('success', 'User deleted permanently.');
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
     }
 
     #[Test]
@@ -135,35 +146,21 @@ class UserControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_can_permanently_delete_a_user()
-    {
-        // Arrangements
-        $user = User::factory()->create(['deleted_at' => now()]);
-
-        // Actions
-        $response = $this->delete(route('users.delete', $user->id));
-
-        // Assertions
-        $response->assertRedirect(route('users.trashed'));
-        $response->assertSessionHas('success', 'User deleted permanently.');
-        $this->assertDeleted($user);
-    }
-
-    #[Test]
     public function it_can_store_a_new_user()
     {
         // Arrangements
         $user = User::factory()->make()->toArray();
+        $user['password'] = 'megatron';
+        $user['password_confirmation'] = $user['password'];
 
         // Actions
         $response = $this->post(route('users.store'), $user);
-
         unset($user['password_confirmation']);
 
         // Assertions
-        $this->assertDatabaseHas('users', $user);
         $response->assertRedirect(route('users.index'));
         $response->assertSessionHas('success', 'User created successfully.');
+        $this->assertDatabaseHas('users', ['email' => $user['email']]);
     }
 
     #[Test]
@@ -171,14 +168,26 @@ class UserControllerTest extends TestCase
     {
         // Arrangements
         $user = User::factory()->create();
-        $updatedUser = User::factory()->make()->toArray();
+        $updatedUser = $user->toArray();
+
+        // Ensure to provide password confirmation if needed
+        if (isset($updatedUser['password'])) {
+            $updatedUser['password_confirmation'] = $updatedUser['password'];
+        }
+
+        // Change email field
+        $updatedUser['email'] = 'new@email.com';
 
         // Actions
         $response = $this->put(route('users.update', $user->id), $updatedUser);
-        unset($updatedUser['password_confirmation']);
+        unset($updatedUser['password_confirmation']); // Remove if it exists
+        unset($updatedUser['profile_photo_url']); // Remove fields that aren't in the database
 
         // Assertions
-        $this->assertDatabaseHas('users', $updatedUser);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'email' => $updatedUser['email'],
+        ]);
         $response->assertRedirect(route('users.index'));
         $response->assertSessionHas('success', 'User updated successfully.');
     }

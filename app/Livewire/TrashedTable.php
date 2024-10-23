@@ -12,10 +12,10 @@ class TrashedTable extends UserTable
 
         // create table array
         $this->columns = [
-            'name' => 'Name',
-            'username' => 'Username',
-            'prefixname' => 'Prefix Name',
-            'suffixname' => 'Suffix Name',
+            'user' => 'User',
+            'fullname' => 'Fullname',
+            'middle' => 'Middle Initial',
+            'gender' => 'Gender',
             'type' => 'Type',
             'actions' => 'Actions',
         ];
@@ -28,10 +28,10 @@ class TrashedTable extends UserTable
                 'method' => 'PATCH',
             ],
             [
-                'route' => 'users.delete',
+                'route' => 'users.destroy',
                 'hoverColor' => 'red-500',
-                'icon' => 'fa-solid fa-ban',
-                'method' => 'DELETE',
+                'icon' => 'fa-solid fa-burst',
+                'method' => 'GET',
             ]
         ];
     }

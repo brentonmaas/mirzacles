@@ -58,7 +58,7 @@
                     </div>
                 </div>
             </div>
-            <div class="absolute inset-y-0 right-20 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div class="inset-y-0 right-20 flex items-center pr-2  sm:inset-auto sm:static sm:items-end sm:right-1 sm:ml-6 sm:pr-0">
 
                 <!-- Profile dropdown -->
                 <div class="relative ml-3" x-data="{ open: false }" @click.away="open = false">
@@ -105,13 +105,26 @@
     </div>
 
     <!-- Mobile menu, show/hide based on menu state. -->
-    <div class="sm:hidden" id="mobile-menu">
+    <div class="sm:hidden hidden" id="mobile-menu">
         <div class="space-y-1 px-2 pb-3 pt-2">
-            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="#" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Dashboard</a>
-            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
-            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
-            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
+            @foreach($navMenu as $item)
+                @if($item['label'] == $currentNav)
+                    <div wire:click="{{ $item['handler'] }}"
+                         class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
+                         role="menuitem"
+                         aria-current="page"
+                    >
+                        {{ $item['label'] }}
+                    </div>
+                @else
+                    <div wire:click="{{ $item['handler'] }}"
+                         class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                         role="menuitem"
+                    >
+                        {{ $item['label'] }}
+                    </div>
+                @endif
+            @endforeach
         </div>
     </div>
 </nav>

@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Http\Controllers\UserController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use App\Services\UserService;
 use App\Services\UserServiceInterface;
+use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,5 +32,8 @@ class AppServiceProvider extends ServiceProvider
             Route::patch("$prefix/restore/{id}", "$controller@restore")->name("$prefix.restore");
             Route::delete("$prefix/delete/{id}", "$controller@delete")->name("$prefix.delete");
         });
+
+        // Register observers
+        User::observe(UserObserver::class);
     }
 }

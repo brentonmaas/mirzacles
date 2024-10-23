@@ -1,26 +1,34 @@
 <div class="bg-gray-900">
     <div class="mx-auto max-w-7xl">
         <div class="bg-gray-900 py-10">
-            <div class="px-4 sm:px-6 lg:px-8">
+            <form enctype=multipart/form-data wire:submit.prevent="store">
+                @csrf
+                <div id="formBlock" class="px-4 sm:px-6 lg:px-8 overflow-y-auto h-[calc(100vh-205px)] overflow-x-hidden scrollbar-thin">
 
-                @if ($errors->any())
-                    <div class="bg-red-600 border border-red-700 text-white px-4 py-3 rounded relative mb-8" role="alert">
-                        <strong class="font-bold">Whoops!</strong>
-                        <span class="block">There were some problems with your input.</span>
-                        <ul class="mt-3 list-disc list-inside text-sm">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                    @if ($errors->any())
+                        <div class="bg-red-600 border border-red-700 text-white px-4 py-3 rounded relative mb-8" role="alert">
+                            <strong class="font-bold">Whoops!</strong>
+                            <span class="block">There were some problems with your input see below.</span>
+                        </div>
+                    @endif
 
-                <form enctype=multipart/form-data wire:submit.prevent="store">
-                    @csrf
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            Livewire.on('scrollTop', () => {
+                                const formBlock = document.getElementById("formBlock");
+                                formBlock.scrollTo({
+                                    top: 0,
+                                    behavior: 'smooth'
+                                });
+                            });
+                        });
+                    </script>
+
+
                     <div class="space-y-12">
                         <div class="border-b border-white/10 pb-12">
                             <h2 class="text-base font-semibold leading-7 text-white">User Form</h2>
-                            <p class="mt-1 text-sm leading-6 text-gray-400">This information will be displayed publicly so be careful what you share.</p>
+                            <p class="mt-1 text-sm leading-6 text-gray-400"><i class="fa-solid fa-circle-info text-indigo-400 text-base mr-2"></i>Changing the password will log the user out.</p>
 
                             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
@@ -32,6 +40,7 @@
                                             <input type="text" name="name" id="name" wire:model.lazy="name" required autocomplete="name" class="flex-1 border-0 bg-transparent py-1.5 pl-1 text-white focus:ring-0 sm:text-sm sm:leading-6" placeholder="janesmith">
                                         </div>
                                     </div>
+                                    @error('name') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- Type -->
@@ -65,10 +74,13 @@
 
                                 <!-- Password -->
                                 <div class="sm:col-span-2">
-                                    <label for="password" class="block text-sm font-medium leading-6 text-white">Password</label>
+                                    <label for="password" class="block text-sm font-medium leading-6 text-white">
+                                        Password <span class="text-xs text-gray-400">(leave blank if you don't want to change it)</span>
+                                    </label>
                                     <div class="mt-2">
                                         <input id="password" name="password" type="password" wire:model.lazy="password" autocomplete="password" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
+                                    @error('password') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div class="sm:col-span-2">
@@ -76,6 +88,7 @@
                                     <div class="mt-2">
                                         <input id="password_confirmation" name="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="password_confirmation" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
+                                    @error('password_confirmation') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- Email -->
@@ -84,6 +97,7 @@
                                     <div class="mt-2">
                                         <input id="email" name="email" type="email" wire:model.lazy="email" required autocomplete="email" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
+                                    @error('email') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- Photo -->
@@ -112,7 +126,7 @@
 
                         <div class="border-b border-white/10 pb-12">
                             <h2 class="text-base font-semibold leading-7 text-white">Personal Information</h2>
-                            <p class="mt-1 text-sm leading-6 text-gray-400">Use a permanent address where you can receive mail.</p>
+                            <p class="mt-1 text-sm leading-6 text-gray-400">Enter your full name information.</p>
 
                             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
@@ -121,6 +135,7 @@
                                     <div class="mt-2">
                                         <input type="text" name="firstname" id="firstname" required wire:model.lazy="firstname" autocomplete="given-name" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
+                                    @error('firstname') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div class="sm:col-span-2">
@@ -135,6 +150,7 @@
                                     <div class="mt-2">
                                         <input type="text" name="lastname" id="lastname" required wire:model.lazy="lastname" autocomplete="family-name" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
+                                    @error('lastname') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- prefix names -->
@@ -175,13 +191,13 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="mt-6 flex items-center justify-end gap-x-6">
-                        <button type="button" wire:click="cancel" class="text-sm font-semibold leading-6 text-white">Cancel</button>
-                        <button type="submit" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Save</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="mt-6 flex items-center justify-end gap-x-6">
+                    <button type="button" wire:click="cancel" class="text-sm font-semibold leading-6 text-white">Cancel</button>
+                    <button type="submit" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+

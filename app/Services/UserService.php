@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Detail;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -226,4 +227,34 @@ class UserService implements UserServiceInterface
     {
         return User::onlyTrashed()->count();
     }
+
+    /**
+     * Update the details table.
+     *
+     * @param User $user
+     * @return void
+     */
+    public function updateDetails(User $user): void
+    {
+        $fullName = $user->getFullnameAttribute();
+        $middleInitial = $user->getMiddleInitialAttribute();
+        $avatar = $user->getAvatarAttribute();
+        $gender = $user->getGenderAttribute();
+
+        // Save the details
+        $details = [
+            ['key' => 'Full name', 'value' => "$fullName {$user->suffixname}", 'type' => 'bio', 'user_id' => $user->id],
+            ['key' => 'Middle Initial', 'value' => $middleInitial, 'type' => 'bio', 'user_id' => $user->id],
+            ['key' => 'Avatar', 'value' => $avatar, 'type' => 'bio', 'user_id' => $user->id],
+            ['key' => 'Gender', 'value' => $gender, 'type' => 'bio', 'user_id' => $user->id],
+        ];
+
+        foreach ($details as $detail) {
+            Detail::updateOrCreate(
+                ['key' => $detail['key'], 'user_id' => $user->id], // Conditions
+                $detail // Values
+            );
+        }
+    }
+
 }

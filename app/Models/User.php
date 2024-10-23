@@ -81,6 +81,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Retrieve the user's gender based on the prefixname.
+     * E.g., "Mr" -> "Male"
+     *
+     * @return string
+     */
+    public function getGenderAttribute(): string
+    {
+        if (in_array($this->prefixname, ['Mr'])) {
+            return 'Male';
+        } elseif (in_array($this->prefixname, ['Mrs', 'Ms'])) {
+            return 'Female';
+        }
+        return 'Other';
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -130,5 +146,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the details for the user.
+     */
+    public function details()
+    {
+        return $this->hasMany(Detail::class);
     }
 }

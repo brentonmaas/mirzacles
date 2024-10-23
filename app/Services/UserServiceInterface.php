@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -111,4 +112,12 @@ interface UserServiceInterface
      * @return int
      */
     public function totalTrashed(): int;
+
+    /**
+     * Update the details table.
+     *
+     * @param User $user
+     * @return void
+     */
+    public function updateDetails(User $user): void;
 }

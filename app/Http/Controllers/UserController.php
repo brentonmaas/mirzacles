@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Services\UserServiceInterface;
 use Illuminate\Http\Request;
@@ -40,7 +41,20 @@ class UserController extends Controller
         return view('users.edit', compact('nav', 'id'));
     }
 
-    public function destroy($id)
+    public function trashed()
+    {
+        $nav = 'Trashed';
+        return view('users.trashed', compact('nav'));
+    }
+
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+        return redirect()->route('users.trashed')->with('success', 'User restored successfully.');
+    }
+
+    public function delete($id)
     {
         $user = User::find($id);
 
@@ -53,24 +67,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User moved to trash!');
     }
 
-
-    public function trashed()
-    {
-        $nav = 'Trashed';
-        return view('users.trashed', compact('nav'));
-    }
-
-
-    // Restore a specific trashed user.
-    public function restore($id)
-    {
-        $user = User::onlyTrashed()->findOrFail($id);
-        $user->restore();
-        return redirect()->route('users.trashed')->with('success', 'User restored successfully.');
-    }
-
-    // Permanently delete a specific user.
-    public function delete($id)
+    public function destroy($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
         $user->forceDelete();
