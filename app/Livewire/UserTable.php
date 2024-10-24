@@ -12,18 +12,23 @@ use Livewire\WithPagination;
 class UserTable extends Component
 {
     use WithPagination;
+
     public int $perPage = 20;
     public int $pageDelta = 2;
     public int $currentPage = 1;
 
     public array $columns;
     public array $actions;
+    public array $modal;
+
+    public bool $addUser;
 
     protected $userService;
 
     public function mount(UserServiceInterface $userService)
     {
         $this->userService = $userService;
+        $this->addUser = true;
 
         // create table array
         $this->columns = [
@@ -41,19 +46,45 @@ class UserTable extends Component
                 'hoverColor' => 'indigo-300',
                 'icon' => 'fa-solid fa-eye',
                 'method' => 'GET',
+                'dialog' => false,
             ],
             [
                 'route' => 'users.edit',
                 'hoverColor' => 'indigo-300',
                 'icon' => 'fa-solid fa-pen-to-square',
                 'method' => 'GET',
+                'dialog' => false,
             ],
             [
                 'route' => 'users.delete',
                 'hoverColor' => 'red-500',
                 'icon' => 'fa-solid fa-trash-can',
                 'method' => 'DELETE',
+                'dialog' => true,
             ]
+        ];
+
+        $this->modal = [
+            'show' => false,
+            'route' => '',
+            'userId' => '',
+            'method' => '',
+            'title' => 'Delete User',
+            'text' => 'Are you sure you want to move the user to trash?',
+            'button' => 'Delete',
+        ];
+    }
+
+    public function showModal($route, $userId, $method)
+    {
+        $this->modal = [
+            'show' => true,
+            'route' => $route,
+            'userId' => $userId,
+            'method' => $method,
+            'title' => 'Delete User',
+            'text' => 'Are you sure you want to move the user to trash?',
+            'button' => 'Delete',
         ];
     }
 

@@ -39,6 +39,11 @@
                         </dl>
                     </div>
                 </div>
+                <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none ml-auto float-right">
+                    <button wire:click="backToUsers" type="button" class="block rounded-md bg-indigo-500 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                        Back To Users
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -1,21 +1,36 @@
 <div class="px-4 sm:px-6 lg:px-8">
     <!-- use error message blade -->
-    @livewire('error-message')
+    <livewire:error-message />
 
     <!-- use success message blade -->
-    @livewire('success-message')
+    <livewire:success-message />
+
+    <!-- modal dialog for actions -->
+    @if($modal['show'])
+        <livewire:modal-dialog
+            :show="$modal['show']"
+            :route="$modal['route']"
+            :userId="$modal['userId']"
+            :method="$modal['method']"
+            :title="$modal['title']"
+            :text="$modal['text']"
+            :button="$modal['button']"
+        />
+    @endif
 
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
             <h1 class="text-base font-semibold leading-6 text-white">Users</h1>
             <p class="mt-2 text-sm text-gray-300">A list of all the users in your account.</p>
         </div>
-        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-            <button wire:click="createUser" type="button" class="block rounded-md bg-indigo-500 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                <i class="fa-solid fa-user-plus mr-1"></i>
-                Add user
-            </button>
-        </div>
+        @if($addUser)
+            <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                <button wire:click="createUser" type="button" class="block rounded-md bg-indigo-500 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                    <i class="fa-solid fa-user-plus mr-1"></i>
+                    Add user
+                </button>
+            </div>
+        @endif
     </div>
     <div class="mt-8 flow-root scrollbar-thin" style="height:calc(100vh - 380px);overflow-x:hidden;overflow-y: auto;">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -67,18 +82,25 @@
                                     @case('actions')
                                         <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0 text-white">
                                             @foreach($actions as $action)
-                                                @if($action['method'] == 'GET')
-                                                    <div class="inline-block">
-                                                        <a href="{{ route($action['route'], ['id' => $row['id']]) }}" class="text-indigo-400 hover:text-{{ $action['hoverColor'] }} mr-2">
-                                                            <i class="{{ $action['icon'] }}"></i>
-                                                        </a>
+                                                @if($action['dialog'])
+                                                    <div class="inline-block text-indigo-400 hover:text-{{ $action['hoverColor'] }} mr-2"
+                                                         wire:click="showModal('{{ $action['route']}}', '{{ $row['id'] }}', '{{ $action['method'] }}')">
+                                                        <i class="{{ $action['icon'] }}"></i>
                                                     </div>
                                                 @else
-                                                    <form action="{{ route($action['route'], ['id' => $row['id']]) }}" method="POST" style="display:inline;">
-                                                        @csrf
-                                                        @method($action['method'])
-                                                        <button type="submit" class="btn btn-success text-indigo-400 hover:text-{{ $action['hoverColor'] }} mr-2"><i class="{{ $action['icon'] }}"></i></button>
-                                                    </form>
+                                                    @if($action['method'] == 'GET')
+                                                        <div class="inline-block">
+                                                            <a href="{{ route($action['route'], ['id' => $row['id']]) }}" class="text-indigo-400 hover:text-{{ $action['hoverColor'] }} mr-2">
+                                                                <i class="{{ $action['icon'] }}"></i>
+                                                            </a>
+                                                        </div>
+                                                    @else
+                                                        <form action="{{ route($action['route'], ['id' => $row['id']]) }}" method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method($action['method'])
+                                                            <button type="submit" class="btn btn-success text-indigo-400 hover:text-{{ $action['hoverColor'] }} mr-2"><i class="{{ $action['icon'] }}"></i></button>
+                                                        </form>
+                                                    @endif
                                                 @endif
                                             @endforeach
                                         </td>
@@ -161,5 +183,20 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+    <script>
+        function openModal(route, id, method) {
+            console.log("Opening modal with:", route, id, method);
+            Livewire.emit('openModal', route, id, method);
+        }
+
+        document.addEventListener('livewire:load', function () {
+            Livewire.on('triggerModal', (route, id, method) => {
+                openModal(route, id, method);
+            });
+        });
+    </script>
+@endpush
 
 

@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Services\UserServiceInterface;
+use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
 use App\Models\User;
 
@@ -25,6 +26,11 @@ class UserProfile extends Component
         }
 
         $this->fullname = $this->user->getFullnameAttribute();
+    }
+
+    public function backToUsers()
+    {
+        return Redirect::route('users.index');
     }
 
     public function render()

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Test;
@@ -168,20 +169,21 @@ class UserControllerTest extends TestCase
     {
         // Arrangements
         $user = User::factory()->create();
-        $updatedUser = $user->toArray();
 
-        // Ensure to provide password confirmation if needed
-        if (isset($updatedUser['password'])) {
-            $updatedUser['password_confirmation'] = $updatedUser['password'];
-        }
-
-        // Change email field
-        $updatedUser['email'] = 'new@email.com';
+        // Change name field
+        $updatedUser = [
+            'name' => $user->name,
+            'email' => 'new@email.com',
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+            'middlename' => $user->middlename,
+            'prefixname' => $user->prefixname,
+            'suffixname' => $user->suffixname,
+            'type' => $user->type,
+        ];
 
         // Actions
         $response = $this->put(route('users.update', $user->id), $updatedUser);
-        unset($updatedUser['password_confirmation']); // Remove if it exists
-        unset($updatedUser['profile_photo_url']); // Remove fields that aren't in the database
 
         // Assertions
         $this->assertDatabaseHas('users', [

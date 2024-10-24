@@ -48,19 +48,39 @@ class UserService implements UserServiceInterface
      */
     public function rules(?int $id = null): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'password' => 'sometimes|nullable|confirmed|string|min:8',  // Password validation
-            'password_confirmation' => 'sometimes|nullable|string|min:8', // Confirm Password validation
-            'email' => 'required|email|max:255',
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'middlename' => 'nullable|string|max:255',
-            'prefixname' => 'required|string|max:3',
-            'suffixname' => 'nullable|string|max:255',
-            'type' => 'required|string|max:255',
-            'photo' => 'nullable|file|max:2048',
-        ];
+        // Different rules depending on whether user exists
+        if($id)
+        {
+            return [
+                'name' => 'required|string|max:255',
+                'password' => 'sometimes|nullable|confirmed|string|min:8',  // Password validation
+                'password_confirmation' => 'sometimes|nullable|string|min:8', // Confirm Password validation
+                'email' => 'required|email|max:255',
+                'firstname' => 'required|string|max:255',
+                'lastname' => 'required|string|max:255',
+                'middlename' => 'nullable|string|max:255',
+                'prefixname' => 'required|string|max:3',
+                'suffixname' => 'nullable|string|max:255',
+                'type' => 'required|string|max:255',
+                'photo' => 'nullable|file|max:2048',
+            ];
+        }
+        else
+        {
+            return [
+                'name' => 'required|string|max:255',
+                'password' => 'required|nullable|confirmed|string|min:8',  // Password validation
+                'password_confirmation' => 'required|nullable|string|min:8', // Confirm Password validation
+                'email' => 'required|email|max:255',
+                'firstname' => 'required|string|max:255',
+                'lastname' => 'required|string|max:255',
+                'middlename' => 'nullable|string|max:255',
+                'prefixname' => 'required|string|max:3',
+                'suffixname' => 'nullable|string|max:255',
+                'type' => 'required|string|max:255',
+                'photo' => 'nullable|file|max:2048',
+            ];
+        }
     }
 
     /**

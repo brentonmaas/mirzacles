@@ -78,7 +78,7 @@
                                         Password <span class="text-xs text-gray-400">(leave blank if you don't want to change it)</span>
                                     </label>
                                     <div class="mt-2">
-                                        <input id="password" name="password" type="password" wire:model.lazy="password" autocomplete="password" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                                        <input id="password" name="password" type="password" {{ $userId ? '' : 'required' }} wire:model.lazy="password" autocomplete="password" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
                                     @error('password') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
@@ -86,7 +86,7 @@
                                 <div class="sm:col-span-2">
                                     <label for="password_confirmation" class="block text-sm font-medium leading-6 text-white">Confirm Password</label>
                                     <div class="mt-2">
-                                        <input id="password_confirmation" name="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="password_confirmation" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                                        <input id="password_confirmation" name="password_confirmation" {{ $userId ? '' : 'required' }} type="password" wire:model="password_confirmation" autocomplete="password_confirmation" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     </div>
                                     @error('password_confirmation') <span class="text-red-500 text-sm mt-2">{{ $message }}</span> @enderror
                                 </div>
