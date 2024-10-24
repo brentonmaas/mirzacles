@@ -46,9 +46,8 @@ class UserService implements UserServiceInterface
      * @param int|null $id
      * @return array
      */
-    public function rules(?int $id = null): array
+    public function rules(int $id = null): array
     {
-        // Different rules depending on whether user exists
         if($id)
         {
             return [

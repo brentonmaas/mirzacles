@@ -41,20 +41,25 @@ class UserForm extends Component
     public function mount(UserServiceInterface $userService, $id = null)
     {
         $this->userService = $userService;
-        $this->userId = $id;
+        $this->userId = $id !== null ? (int)$id : null;
 
         if ($this->userId) {
-            $user = $this->userService->find($this->userId);
-            $this->name = $user->name;
-            $this->email = $user->email;
-            $this->type = $user->type;
-            $this->avatar = $user->avatar;
-            $this->firstname = $user->firstname;
-            $this->lastname = $user->lastname;
-            $this->middlename = $user->middlename;
-            $this->prefixname = $user->prefixname;
-            $this->suffixname = $user->suffixname;
+            $this->loadUserData();
         }
+    }
+
+    protected function loadUserData()
+    {
+        $user = $this->userService->find($this->userId);
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->type = $user->type;
+        $this->avatar = $user->avatar;
+        $this->firstname = $user->firstname;
+        $this->lastname = $user->lastname;
+        $this->middlename = $user->middlename;
+        $this->prefixname = $user->prefixname;
+        $this->suffixname = $user->suffixname;
     }
 
     public function updatedPhoto()

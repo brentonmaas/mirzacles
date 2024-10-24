@@ -38,7 +38,8 @@ class UserController extends Controller
     public function edit($id)
     {
         $nav = 'Edit';
-        return view('users.edit', compact('nav', 'id'));
+        $userId = $id ? (int)$id : null;
+        return view('users.edit', compact('nav', 'userId'));
     }
 
     public function trashed()

@@ -1,5 +1,5 @@
 <x-app-layout :nav="$nav">
-    <livewire:userForm :id="$id" />
+    <livewire:userForm :id="$userId" />
 </x-app-layout>
 
 

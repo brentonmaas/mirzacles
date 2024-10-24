@@ -78,9 +78,9 @@ class UserControllerTest extends TestCase
         // Assertions
         $response->assertStatus(200);
         $response->assertViewIs('users.edit');
-        $response->assertViewHasAll(['nav', 'id']);
+        $response->assertViewHasAll(['nav', 'userId']);
         $response->assertViewHas('nav', 'Edit');
-        $response->assertViewHas('id', $user->id);
+        $response->assertViewHas('userId', $user->id);
     }
 
     #[Test]
@@ -167,20 +167,15 @@ class UserControllerTest extends TestCase
     #[Test]
     public function it_can_update_an_existing_user()
     {
+        $email = 'test@email.com';
+
         // Arrangements
         $user = User::factory()->create();
-
-        // Change name field
-        $updatedUser = [
-            'name' => $user->name,
-            'email' => 'new@email.com',
-            'firstname' => $user->firstname,
-            'lastname' => $user->lastname,
-            'middlename' => $user->middlename,
-            'prefixname' => $user->prefixname,
-            'suffixname' => $user->suffixname,
-            'type' => $user->type,
-        ];
+        $updatedUser = $user->toArray();
+        $updatedUser['id'] = $user->id !== null ? (int)$user->id : null;
+        $updatedUser['email'] = $email;
+        $updatedUser['password'] = 'megatron';
+        $updatedUser['password_confirmation'] = $user['password'];
 
         // Actions
         $response = $this->put(route('users.update', $user->id), $updatedUser);
@@ -188,7 +183,7 @@ class UserControllerTest extends TestCase
         // Assertions
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
-            'email' => $updatedUser['email'],
+            'email' => $email,
         ]);
         $response->assertRedirect(route('users.index'));
         $response->assertSessionHas('success', 'User updated successfully.');
